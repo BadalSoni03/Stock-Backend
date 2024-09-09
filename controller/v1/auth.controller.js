@@ -1,6 +1,6 @@
 const User = require('../../entity/user.entity');
 const JWT = require('jsonwebtoken');
-const { Http } = require('../../util/http');
+const { Http } = require('../../util/http.util');
 
 
 const signUpController = async (req, res) => {
