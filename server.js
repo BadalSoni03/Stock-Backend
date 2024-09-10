@@ -11,9 +11,7 @@ const PORT = process.env.PORT || 8000;
 app.use(morgan('dev'));
 app.use(express.json());
 
-
-const authRouter = require('./route/v1/auth.route');
-
-app.use('/api/v1/auth/', authRouter);
+const router = require('./route/index.route');
+app.use('/api', router);
 
 app.listen(PORT, () => console.log('app started'));

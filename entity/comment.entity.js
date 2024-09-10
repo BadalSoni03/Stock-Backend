@@ -11,13 +11,9 @@ const postModel = new mongoose.Schema({
         ref: 'Post',
         required: true
     },
-	text: {
+    text: {
         type: String
-    },
-    tags: [{
-        type: mongoose.Types.ObjectId,
-        ref: 'User'
-    }]
+    }
 }, { timestamp: true })
 
 module.exports = mongoose.model('Comment', postModel);

@@ -1,10 +1,12 @@
 class HttpResponse {
+
     constructor(success, statusCode, message, data) {
         this.success = success;
         this.statusCode = statusCode;
         this.message = message;
         this.data = data;
     }
+
 }
 
 class Http {
@@ -15,6 +17,7 @@ class Http {
     static UNAUTHORIZED = 401;
     static FORBIDDEN_ACCESS = 403;
     static INTERNAL_SERVER_ERROR = 500;
+    static NOT_FOUND = 404;
     static SUCCESS_TRUE = true;
     static SUCCESS_FALSE = false;
 
@@ -22,6 +25,7 @@ class Http {
         const response = new HttpResponse(success, statusCode, message, data);
         return res.status(statusCode).json(response);
     }
+    
 }
 
 module.exports = { HttpResponse, Http };
