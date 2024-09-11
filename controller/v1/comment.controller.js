@@ -36,18 +36,49 @@ const createCommentController = async (req, res) => {
     } catch (error) {
         session.abortTransaction();
         return Http.sendResponse(res, Http.INTERNAL_SERVER_ERROR, Http.SUCCESS_FALSE, error.message);
+    } finally {
+        session.endSession();
     }
 };
 
 const deleteCommentById = async (req, res) => {
     const session = await mongoose.startSession();
-    mongoose.startTransaction();
+    session.startTransaction();
     try {
-        // todo:
+        const { postId, commentId } = req.params;
+        console.log('PostId: ' + postId);
+        console.log('Comment Id: ' + commentId);
+        if (!isValidMongoDbId(postId)) {
+            session.abortTransaction();
+            return Http
+                .sendResponse(res, Http.BAD_REQUEST, Http.SUCCESS_FALSE, 'Invalid post Id');
+        }
+        if (!isValidMongoDbId(commentId)) {
+            session.abortTransaction();
+            return Http
+                .sendResponse(res, Http.BAD_REQUEST, Http.SUCCESS_FALSE, 'Invalid comment Id');
+        }
 
+        const post = await Post.findById(postId);
+        const index = post
+            .comments
+            .findIndex(cId => cId.toString() === commentId.toString());
+
+        if (index !== -1) {
+            post.comments.splice(index, 1);
+        }
+
+        await post.save({ session });
+        await Comment.deleteOne({ _id: commentId });
+        
+        session.commitTransaction();
+        return Http
+            .sendResponse(res, Http.SUCCESS, Http.SUCCESS_TRUE, 'Comment deleted successfully');
     } catch (error) {
         mongoose.abortTransaction();
         return Http.sendResponse(res, Http.INTERNAL_SERVER_ERROR, Http.SUCCESS_TRUE, error.message);
+    } finally {
+        session.endSession();
     }
 };
 

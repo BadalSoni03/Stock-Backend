@@ -5,6 +5,9 @@ const User = require('../entity/user.entity');
 const isLoggedIn = async (req, res, next) => {
     try {
         const authToken = req.headers?.authorization;
+        if (!authToken) {
+            throw new Error('Token is missing');
+        }
         const splittedToken = authToken.split(' ');
 
         const authTokenComponents = 2;

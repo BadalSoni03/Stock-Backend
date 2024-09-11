@@ -18,8 +18,6 @@ const createPostController = async (req, res) => {
             description,
             tags
         });
-
-
         await post.save({ session });
 
         loggedInUser.posts.push(post);
@@ -34,6 +32,8 @@ const createPostController = async (req, res) => {
     } catch (error) {
         session.abortTransaction();
         return Http.sendResponse(res, Http.INTERNAL_SERVER_ERROR, Http.SUCCESS_FALSE, error.message);
+    } finally {
+        session.endSession();
     }
 };
 
@@ -87,6 +87,10 @@ const deletePostById = async (req, res) => {
         }
 
         const loggedInUser = req.user;
+        const postToBeDeleted = await Post.findById(postIdToRemove);
+        if (postToBeDeleted.postedBy._id.toString() !== loggedInUser._id.toString()) {
+            return Http.sendResponse(res, Http.FORBIDDEN_ACCESS, Http.SUCCESS_FALSE, 'Not allowed to delete this post');
+        }
         const index = loggedInUser
             .posts
             .findIndex(postId => postId.toString() === postIdToRemove.toString());
@@ -103,15 +107,38 @@ const deletePostById = async (req, res) => {
     } catch (error) {
         session.abortTransaction();
         return Http.sendResponse(res, Http.INTERNAL_SERVER_ERROR, Http.SUCCESS_FALSE, error.message);
+    } finally {
+        session.endSession();
     }
 }
 
-const getFilteredPost = async (req, res) => {
-    // todo: filter posts based on time, symbol, etc..
+const getAllPosts = async (req, res) => {
+    try {
+        const allPosts = await Post.find();
+        const posts = [];
+        allPosts
+            .forEach(post => {
+                const data = {
+                    postId: post._id,
+                    stockSymbol: post.stockSymbol,
+                    title: post.title,
+                    description: post.description,
+                    likesCount: post.likesCount,
+                    createdAt: post.createdAt
+                };
+                posts.add(data);
+            });
+
+        const data = { posts };
+        return Http.sendResponse(res, Http.SUCCESS, Http.SUCCESS_TRUE, data);
+    } catch (error) {
+        return Http.sendResponse(res, Http.INTERNAL_SERVER_ERROR, Http.SUCCESS_FALSE, error.message);
+    }
 }
 
 module.exports = {
     createPostController,
     getPostById,
-    deletePostById
+    deletePostById,
+    getAllPosts
 }

@@ -24,7 +24,17 @@ const userSchema = new mongoose.Schema({
     posts: [{
         type: mongoose.Types.ObjectId,
         ref: 'Post'
-    }]
+    }],
+    bio: {
+        type: String,
+        default: '',
+        required: false
+    },
+    profilePicture: {
+        type: String,
+        default: '',
+        required: false
+    }
 }, { timestamps: true });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {

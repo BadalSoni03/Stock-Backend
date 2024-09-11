@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const postModel = new mongoose.Schema({
+const postSchema = new mongoose.Schema({
 	postedBy: {
 		type: mongoose.Types.ObjectId,
 		ref: 'User',
@@ -32,4 +32,4 @@ const postModel = new mongoose.Schema({
 	}]
 }, { timestamp: true })
 
-module.exports = mongoose.model('Post', postModel);
+module.exports = mongoose.model('Post', postSchema);
